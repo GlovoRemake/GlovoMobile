@@ -1,15 +1,14 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
-import "../global.css"
+import '../global.css';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import {PortalHost} from "@rn-primitives/portal";
+import { PortalHost } from '@rn-primitives/portal';
 import { Provider } from 'react-redux';
 import { store } from '@/store';
 
-import { useFonts } from "@expo-google-fonts/nunito";
+import { useFonts } from '@expo-google-fonts/nunito';
 import {
     Nunito_400Regular,
     Nunito_500Medium,
@@ -17,14 +16,10 @@ import {
     Nunito_700Bold,
     Nunito_800ExtraBold,
     Nunito_900Black,
-} from "@expo-google-fonts/nunito";
-
-export const unstable_settings = {
-  anchor: '(auth)',
-};
+} from '@expo-google-fonts/nunito';
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+    const colorScheme = useColorScheme();
 
     const [fontsLoaded] = useFonts({
         Nunito: Nunito_400Regular,
@@ -39,16 +34,28 @@ export default function RootLayout() {
         return null;
     }
 
-  return (
-    <Provider store={store}>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-        </Stack>
-        <StatusBar style="auto" />
-        <PortalHost />
-      </ThemeProvider>
-    </Provider>
-  );
+    return (
+        <Provider store={store}>
+            <Stack>
+                <Stack.Screen
+                    name="(auth)"
+                    options={{ headerShown: false }}
+                />
+
+                <Stack.Screen
+                    name="modal"
+                    options={{
+                        presentation: 'modal',
+                        title: 'Modal',
+                    }}
+                />
+            </Stack>
+
+            <StatusBar
+                style={colorScheme === 'dark' ? 'light' : 'dark'}
+            />
+
+            <PortalHost />
+        </Provider>
+    );
 }

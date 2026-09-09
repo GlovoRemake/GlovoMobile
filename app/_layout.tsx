@@ -17,6 +17,7 @@ import {
     Nunito_800ExtraBold,
     Nunito_900Black,
 } from '@expo-google-fonts/nunito';
+import {View} from "react-native";
 
 export default function RootLayout() {
     const colorScheme = useColorScheme();

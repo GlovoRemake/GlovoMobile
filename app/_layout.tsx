@@ -18,6 +18,12 @@ import {
     Nunito_900Black,
 } from '@expo-google-fonts/nunito';
 import {View} from "react-native";
+import {configureReanimatedLogger, ReanimatedLogLevel} from "react-native-reanimated";
+
+configureReanimatedLogger({
+    level: ReanimatedLogLevel.warn,
+    strict: false,
+});
 
 export default function RootLayout() {
     const colorScheme = useColorScheme();
@@ -40,6 +46,11 @@ export default function RootLayout() {
             <Stack>
                 <Stack.Screen
                     name="(auth)"
+                    options={{ headerShown: false }}
+                />
+
+                <Stack.Screen
+                    name="(main)/test"
                     options={{ headerShown: false }}
                 />
 

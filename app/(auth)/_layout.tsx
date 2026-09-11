@@ -1,22 +1,32 @@
-import { Stack } from "expo-router";
+import {router, Stack} from "expo-router";
+import {useEffect} from "react";
+import {getSecureStore} from "@/utils/secureStore";
 
 export default function AuthLayout() {
-    return (
-        <Stack
-            screenOptions={{
-                headerShown: false,
+    useEffect(() => {
+        if (getSecureStore("refreshToken")) {
+            router.replace("/(main)/test");
+        }
+    }, [])
 
-                // Прибираємо стандартний swipe-back
-                gestureEnabled: false,
+    if (!getSecureStore("refreshToken")) {
+        return (
+            <Stack
+                screenOptions={{
+                    headerShown: false,
 
-                // Власна анімація
-                animation: "fade",
-                animationDuration: 300,
+                    // Прибираємо стандартний swipe-back
+                    gestureEnabled: false,
 
-                contentStyle: {
-                    backgroundColor: "#FFC244",
-                },
-            }}
-        />
-    );
+                    // Власна анімація
+                    animation: "fade",
+                    animationDuration: 300,
+
+                    contentStyle: {
+                        backgroundColor: "#FFC244",
+                    },
+                }}
+            />
+        );
+    }
 }

@@ -35,7 +35,7 @@ type BaseQueryResult = QueryReturnValue<
 const baseQuery = fetchBaseQuery({
     baseUrl: `${APP_ENV.API_URL}/api`,
     prepareHeaders(headers, { getState }) {
-        const token = (getState() as RootState).auth.accessToken;
+        const token = getSecureStore("accessToken");
 
         if (token) {
             headers.set("Authorization", `Bearer ${token}`);

@@ -5,7 +5,7 @@ import {getSecureStore} from "@/utils/secureStore";
 export default function AuthLayout() {
     useEffect(() => {
         if (getSecureStore("refreshToken")) {
-            router.replace("/(main)/test");
+            router.replace("/(main)");
         }
     }, [])
 

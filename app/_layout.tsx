@@ -50,7 +50,7 @@ export default function RootLayout() {
                 />
 
                 <Stack.Screen
-                    name="(main)/test"
+                    name="(main)"
                     options={{ headerShown: false }}
                 />
 

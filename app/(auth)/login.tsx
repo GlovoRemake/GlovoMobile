@@ -132,7 +132,7 @@ export default function LoginScreen() {
             } else {
                 saveSecureStore("accessToken", res.accessToken);
                 saveSecureStore("refreshToken", res.refreshToken);
-                router.replace("/(main)/test");
+                router.replace("/(main)/index");
             }
         } catch (error: any) {
             const errors = error?.data?.errors;

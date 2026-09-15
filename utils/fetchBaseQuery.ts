@@ -24,8 +24,10 @@ import {router} from "expo-router";
 interface CustomFetchArgs extends FetchArgs {
     meta?: {
         isBlob?: boolean;
+        isMultipart?: boolean;
     };
 }
+
 
 type BaseQueryResult = QueryReturnValue<
     unknown,
@@ -58,6 +60,10 @@ export const baseQueryWithReauth: BaseQueryFn<
     const isBlob =
         typeof args !== "string" &&
         args.meta?.isBlob === true;
+
+    const isMultipart =
+        typeof args !== "string" &&
+        args.meta?.isMultipart === true;
 
     let result = await baseQuery(
         isBlob

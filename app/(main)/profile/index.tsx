@@ -14,6 +14,7 @@ import { useGetProfileQuery } from "@/store/service/apiAccount";
 import {deleteSecureStore} from "@/utils/secureStore";
 import {router} from "expo-router";
 import {Button} from "@/components/ui/button";
+import APP_ENV from "@/utils/env";
 
 export interface IProfile {
     firstName: string;
@@ -25,7 +26,7 @@ export interface IProfile {
 
 const PRIMARY = "#FFC244";
 
-export default function Profile() {
+export default function Index() {
     const { data, isLoading } = useGetProfileQuery();
 
     if (isLoading) {
@@ -86,6 +87,7 @@ export default function Profile() {
                         <Pressable
                             className="absolute top-3 right-3 h-10 w-10 items-center justify-center rounded-full border border-1 border-black/10"
                             style={{ backgroundColor: PRIMARY }}
+                            onPress={() => router.push("/(main)/profile/updateProfile")}
                         >
                             <Pencil size={18} color="#111827" />
                         </Pressable>
@@ -99,7 +101,7 @@ export default function Profile() {
                             >
                                 {profile.avatarPath ? (
                                     <Image
-                                        source={{ uri: profile.avatarPath }}
+                                        source={{ uri: `${APP_ENV.API_IMAGE_LARGE_URL}${profile.avatarPath}` }}
                                         className="h-full w-full"
                                     />
                                 ) : (

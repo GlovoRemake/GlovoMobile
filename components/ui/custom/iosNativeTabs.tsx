@@ -29,7 +29,7 @@ export default function IOSNativeTabs() {
 
     return (
         <NativeTabs
-            activeIndicatorColor={colors.indicator}
+            indicatorColor={colors.indicator}
             tintColor={GLOVO_COLORS.orange}
 
             labelStyle={{
@@ -38,9 +38,6 @@ export default function IOSNativeTabs() {
                 fontWeight: "600",
                 fontFamily: "Nunito"
             }}
-
-            barTintColor={colors.background}
-            unselectedItemTintColor={colors.inactive}
         >
             {/* ===== ГОЛОВНА ===== */}
             <NativeTabs.Trigger name="index">

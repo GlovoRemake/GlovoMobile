@@ -3,6 +3,7 @@ import { baseQueryWithReauth } from "@/utils/fetchBaseQuery";
 import {ITokensResponse} from "@/types/token/ITokensResponse";
 import {IAuthLogin} from "@/types/auth/IAuthLogin";
 import {IAuthRegister} from "@/types/auth/IAuthRegister";
+import {IProfile} from "@/types/account/IProfile";
 
 
 export const apiAccount = createApi({
@@ -58,6 +59,10 @@ export const apiAccount = createApi({
             }),
             invalidatesTags: ["Account"]
         }),
+        getProfile: builder.query<IProfile, void>({
+            query: () => "/Account/GetProfile",
+            providesTags: ["Account"]
+        }),
     }),
 });
 
@@ -68,4 +73,5 @@ export const {
     useSendCodeMutation,
     useVerifyCodeMutation,
     useRegisterMutation,
+    useGetProfileQuery
 } = apiAccount;

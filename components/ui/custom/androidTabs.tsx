@@ -15,16 +15,19 @@ export default function AndroidTabs() {
                 tabBarInactiveTintColor: isDark ? "#777777" : "#999999",
 
                 tabBarStyle: {
+                    position: "absolute",
+
                     height: 72,
                     width: "90%",
 
                     paddingTop: 8,
                     paddingBottom: 12,
-                    marginBottom: 22,
                     paddingLeft: 12,
                     paddingRight: 12,
 
-                    margin: "auto",
+                    marginLeft: "5%",
+
+                    bottom: 22,
 
                     backgroundColor: isDark ? "#181818" : "#FFFFFF",
 
@@ -41,6 +44,7 @@ export default function AndroidTabs() {
 
                     borderRadius: 80,
                 },
+
 
                 tabBarLabelStyle: {
                     fontFamily: "Nunito",

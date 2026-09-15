@@ -19,6 +19,7 @@ import {
 
 import { ApiResponse } from "@/types/api/ApiResponse";
 import { ITokensResponse } from "@/types/token/ITokensResponse";
+import {router} from "expo-router";
 
 interface CustomFetchArgs extends FetchArgs {
     meta?: {
@@ -174,15 +175,11 @@ function logoutAndRedirect(api: BaseQueryApi): void {
     deleteSecureStore("accessToken");
     deleteSecureStore("refreshToken");
 
-    if (typeof window === "undefined") {
-        return;
-    }
-
     if (redirecting) {
         return;
     }
 
     redirecting = true;
 
-    window.location.replace("/auth/login");
+    router.replace("/(auth)/login");
 }

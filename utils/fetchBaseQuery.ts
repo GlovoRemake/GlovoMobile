@@ -103,8 +103,11 @@ export const baseQueryWithReauth: BaseQueryFn<
                     url: "/Account/Refresh",
                     method: "POST",
                     body: {
-                        Token: refreshToken,
+                        token: refreshToken,
                     },
+                    headers: {
+                        "Content-Type": "application/json",
+                    }
                 },
                 api,
                 extraOptions
@@ -136,7 +139,8 @@ export const baseQueryWithReauth: BaseQueryFn<
     api.dispatch(setAccessToken(refreshData.value.accessToken));
     api.dispatch(setRefreshToken(refreshData.value.refreshToken));
 
-    saveSecureStore("refreshToken", refreshData.value.refreshToken)
+    saveSecureStore("accessToken", refreshData.value.accessToken);
+    saveSecureStore("refreshToken", refreshData.value.refreshToken);
 
     result = await baseQuery(args, api, extraOptions);
 

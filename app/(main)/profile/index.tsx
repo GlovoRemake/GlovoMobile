@@ -8,13 +8,14 @@ import {
     CircleHelp,
     LogOut,
     Pencil,
-    ShieldCheck, KeyRound,
+    ShieldCheck, KeyRound, Check, RotateCw,
 } from "lucide-react-native";
 import { useGetProfileQuery } from "@/store/service/apiAccount";
 import {deleteSecureStore} from "@/utils/secureStore";
 import {router} from "expo-router";
 import {Button} from "@/components/ui/button";
 import APP_ENV from "@/utils/env";
+import React from "react";
 
 export interface IProfile {
     firstName: string;
@@ -27,9 +28,9 @@ export interface IProfile {
 const PRIMARY = "#FFC244";
 
 export default function Index() {
-    const { data, isLoading } = useGetProfileQuery();
+    const { data, isLoading, isFetching, refetch } = useGetProfileQuery();
 
-    if (isLoading) {
+    if (isLoading || isFetching) {
         return (
             <View className="flex-1 items-center justify-center bg-gray-50 dark:bg-black">
                 <ActivityIndicator size="large" color={PRIMARY} />
@@ -45,6 +46,19 @@ export default function Index() {
                 <Text className="text-center text-base text-gray-500 dark:text-gray-400">
                     Не вдалося завантажити профіль
                 </Text>
+
+                <Button
+                    onPress={() => refetch()}
+                    className="mt-4 h-10 rounded-[20px] font-nunito transition-all duration-200"
+                    style={{
+                        backgroundColor: PRIMARY,
+                    }}
+                >
+                    <RotateCw size={16} strokeWidth={3}/>
+                    <Text className="text-base font-bold">
+                        Повторити спробу
+                    </Text>
+                </Button>
             </View>
         );
     }

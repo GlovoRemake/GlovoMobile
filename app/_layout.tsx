@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import '../global.css';
 
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { PortalHost } from '@rn-primitives/portal';
 import { Provider } from 'react-redux';
@@ -240,32 +241,39 @@ export default function RootLayout() {
     }
 
     return (
-        <Provider store={store}>
-            <Stack>
-                <Stack.Screen
-                    name="(auth)"
-                    options={{ headerShown: false }}
+        <GestureHandlerRootView style={{ flex: 1, zIndex: 500 }}>
+            <Provider store={store}>
+                <Stack>
+                    <Stack.Screen
+                        name="(auth)"
+                        options={{ headerShown: false }}
+                    />
+
+                    <Stack.Screen
+                        name="(main)"
+                        options={{ headerShown: false }}
+                    />
+
+                    <Stack.Screen
+                        name="(address)"
+                        options={{ headerShown: false }}
+                    />
+
+                    <Stack.Screen
+                        name="modal"
+                        options={{
+                            presentation: 'modal',
+                            title: 'Modal',
+                        }}
+                    />
+                </Stack>
+
+                <StatusBar
+                    style={colorScheme === 'dark' ? 'light' : 'dark'}
                 />
 
-                <Stack.Screen
-                    name="(main)"
-                    options={{ headerShown: false }}
-                />
-
-                <Stack.Screen
-                    name="modal"
-                    options={{
-                        presentation: 'modal',
-                        title: 'Modal',
-                    }}
-                />
-            </Stack>
-
-            <StatusBar
-                style={colorScheme === 'dark' ? 'light' : 'dark'}
-            />
-
-            <PortalHost />
-        </Provider>
+                <PortalHost />
+            </Provider>
+        </GestureHandlerRootView>
     );
 }

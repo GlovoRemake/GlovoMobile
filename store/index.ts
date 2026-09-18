@@ -2,14 +2,18 @@ import { configureStore } from "@reduxjs/toolkit";
 import { type TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import {apiAccount} from "@/store/service/apiAccount"
 import authSlice from "@/store/slices/authSlice";
+import addressReducer from "@/store/slices/addressSlice";
+import {apiAddress} from "@/store/service/apiAddress";
 
 export const store = configureStore({
     reducer: {
         [apiAccount.reducerPath]: apiAccount.reducer,
+        [apiAddress.reducerPath]: apiAddress.reducer,
         auth: authSlice,
+        address: addressReducer,
     },
     middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(apiAccount.middleware)
+        getDefaultMiddleware().concat(apiAccount.middleware).concat(apiAddress.middleware),
 });
 
 // Типи, які знаходяться у Redux

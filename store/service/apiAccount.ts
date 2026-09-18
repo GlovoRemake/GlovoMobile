@@ -57,7 +57,9 @@ export const apiAccount = createApi({
             query: (token) => ({
                 url: "/Account/Refresh",
                 method: "POST",
-                body: { Token: token },
+                body: {
+                    token
+                },
             }),
             invalidatesTags: ["Account"]
         }),
@@ -85,9 +87,6 @@ export const apiAccount = createApi({
             },
             invalidatesTags: ["Account"],
         }),
-
-
-
     }),
 });
 

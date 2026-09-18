@@ -1,21 +1,18 @@
-import {View, Text, Image, Pressable, ActivityIndicator, ScrollView} from "react-native";
+import { Button } from "@/components/ui/button";
+import { useGetProfileQuery } from "@/store/service/apiAccount";
+import APP_ENV from "@/utils/env";
+import { deleteSecureStore } from "@/utils/secureStore";
+import { router } from "expo-router";
 import {
     ChevronRight,
-    MapPin,
-    CreditCard,
-    Bell,
-    Settings,
-    CircleHelp,
+    KeyRound,
     LogOut,
+    MapPin,
     Pencil,
-    ShieldCheck, KeyRound, Check, RotateCw,
+    RotateCw
 } from "lucide-react-native";
-import { useGetProfileQuery } from "@/store/service/apiAccount";
-import {deleteSecureStore} from "@/utils/secureStore";
-import {router} from "expo-router";
-import {Button} from "@/components/ui/button";
-import APP_ENV from "@/utils/env";
 import React from "react";
+import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from "react-native";
 
 export interface IProfile {
     firstName: string;
@@ -54,7 +51,7 @@ export default function Index() {
                         backgroundColor: PRIMARY,
                     }}
                 >
-                    <RotateCw size={16} strokeWidth={3}/>
+                    <RotateCw size={16} strokeWidth={3} />
                     <Text className="text-base font-bold">
                         Повторити спробу
                     </Text>
@@ -155,7 +152,7 @@ export default function Index() {
                         iconBackground="#FFF4D6"
                         title="Мої адреси"
                         subtitle="Керування адресами доставки"
-                        onPress={() => {}}
+                        onPress={() => router.push("/(main)/profile/myAddresses")}
                     />
 
                     <Divider />
@@ -165,7 +162,7 @@ export default function Index() {
                         iconBackground="#E8F7ED"
                         title="Зміна пароля"
                         subtitle="Змінити свій пароль на новий"
-                        onPress={() => {}}
+                        onPress={() => { }}
                     />
                 </View>
 
@@ -201,12 +198,12 @@ interface ProfileRowProps {
 }
 
 function ProfileRow({
-                        icon,
-                        iconBackground,
-                        title,
-                        subtitle,
-                        onPress,
-                    }: ProfileRowProps) {
+    icon,
+    iconBackground,
+    title,
+    subtitle,
+    onPress,
+}: ProfileRowProps) {
     return (
         <Pressable
             onPress={onPress}

@@ -12,6 +12,11 @@ export default function RootLayout() {
                 name="updateProfile"
                 options={{ headerShown: false }}
             />
+
+            <Stack.Screen
+                name="myAddresses"
+                options={{ headerShown: false }}
+            />
         </Stack>
     );
 }

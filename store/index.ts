@@ -4,16 +4,22 @@ import {apiAccount} from "@/store/service/apiAccount"
 import authSlice from "@/store/slices/authSlice";
 import addressReducer from "@/store/slices/addressSlice";
 import {apiAddress} from "@/store/service/apiAddress";
+import {apiCompany} from "@/store/service/apiCompany";
+import {apiAffiliate} from "@/store/service/apiAffiliate";
+import {apiCart} from "@/store/service/apiCart";
 
 export const store = configureStore({
     reducer: {
         [apiAccount.reducerPath]: apiAccount.reducer,
         [apiAddress.reducerPath]: apiAddress.reducer,
+        [apiCompany.reducerPath]: apiCompany.reducer,
+        [apiAffiliate.reducerPath]: apiAffiliate.reducer,
+        [apiCart.reducerPath]: apiCart.reducer,
         auth: authSlice,
         address: addressReducer,
     },
     middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(apiAccount.middleware).concat(apiAddress.middleware),
+        getDefaultMiddleware().concat(apiAccount.middleware).concat(apiAddress.middleware).concat(apiCompany.middleware).concat(apiAffiliate.middleware).concat(apiCart.middleware),
 });
 
 // Типи, які знаходяться у Redux

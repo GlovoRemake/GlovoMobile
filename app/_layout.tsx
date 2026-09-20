@@ -260,6 +260,16 @@ export default function RootLayout() {
                     />
 
                     <Stack.Screen
+                        name="(food)"
+                        options={{ headerShown: false }}
+                    />
+
+                    <Stack.Screen
+                        name="(orders)"
+                        options={{ headerShown: false }}
+                    />
+
+                    <Stack.Screen
                         name="modal"
                         options={{
                             presentation: 'modal',

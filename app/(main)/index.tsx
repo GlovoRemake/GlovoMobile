@@ -32,6 +32,8 @@ import {
     openAddressSheet,
 } from "@/components/address/addressSheet";
 import {useGetAddressesQuery} from "@/store/service/apiAddress";
+import {useGetCompaniesQuery} from "@/store/service/apiCompany";
+import RestaurantCard from "@/components/food/RestaurantCard";
 
 const PRIMARY = "#FFC244";
 
@@ -91,6 +93,7 @@ const categories = [
 export default function HomeScreen() {
     const scheme = useColorScheme();
 
+
     const colors =
         scheme === "dark"
             ? COLORS.dark
@@ -112,6 +115,14 @@ export default function HomeScreen() {
                 selectedAddressId
         ) ?? null;
 
+    const {data: companies, isLoading: isCompaniesLoading, isFetching} = useGetCompaniesQuery({
+        regionId: selectedAddress?.city.region.id ?? -1,
+        companyTypeIds: []
+    }, {
+        skip: !selectedAddress,
+    });
+
+    // @ts-ignore
     return (
         <View
             className={"pt-14"}
@@ -393,6 +404,36 @@ export default function HomeScreen() {
                                 )}
                             </ScrollView>
                         </View>
+
+                        {companies && companies.length > 0 && (
+                            <View className="px-5 pt-8">
+                                <View className="mb-4 flex-row items-center justify-between">
+                                    <View>
+                                        <Text
+                                            style={{ color: colors.text }}
+                                            className="text-xl font-bold"
+                                        >
+                                            Заклади
+                                        </Text>
+                                    </View>
+                                </View>
+
+                                <View className="gap-6">
+                                    {companies.map((company) => (
+                                        <Pressable
+                                            key={company.id}
+                                            onPress={() => router.push({
+                                                pathname: `/(food)/RestaurantScreen`,
+                                                params: { companyId: company.id }
+                                            })}
+                                        >
+                                            <RestaurantCard company={company} />
+                                        </Pressable>
+
+                                    ))}
+                                </View>
+                            </View>
+                        )}
                     </>
                 )}
             </ScrollView>

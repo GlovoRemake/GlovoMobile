@@ -35,6 +35,10 @@ import {
     GREEN,
     money,
 } from "@/components/food/theme";
+import {useGetAddressesQuery} from "@/store/service/apiAddress";
+import {useGetCompaniesQuery} from "@/store/service/apiCompany";
+import {useSelector} from "react-redux";
+import type {RootState} from "@/store";
 
 type CartItem = IUserCart["carts"][number];
 

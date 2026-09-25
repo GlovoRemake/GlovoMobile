@@ -1,4 +1,5 @@
-import React, { useMemo } from "react";
+import React, {useMemo, useRef, useState} from "react";
+import PaymentOption from "@/components/ui/custom/PaymentOption";
 import {
     View,
     Text,
@@ -6,13 +7,14 @@ import {
     Pressable,
     Image,
     Alert,
-    ActivityIndicator,
+    ActivityIndicator, useColorScheme,
 } from "react-native";
 import {
     ChevronLeft,
     Minus,
     Plus,
     Trash2,
+    CreditCard, Banknote, Smartphone, Check
 } from "lucide-react-native";
 import {
     router,
@@ -21,6 +23,12 @@ import {
 import {
     useSafeAreaInsets,
 } from "react-native-safe-area-context";
+
+
+import BottomSheet, {
+    BottomSheetBackdrop,
+    BottomSheetView,
+} from "@gorhom/bottom-sheet";
 
 import {
     useDeleteFromCartMutation,
@@ -39,10 +47,15 @@ import {useGetAddressesQuery} from "@/store/service/apiAddress";
 import {useGetCompaniesQuery} from "@/store/service/apiCompany";
 import {useSelector} from "react-redux";
 import type {RootState} from "@/store";
+import {useConfirmOrderMutation} from "@/store/service/apiOrder";
+import {IPaymentMethod} from "@/types/Order/IPaymentMethod";
 
 type CartItem = IUserCart["carts"][number];
 
 export default function CompanyCart() {
+    const scheme = useColorScheme();
+    const darkMode = scheme == "dark";
+
     const insets = useSafeAreaInsets();
 
     const { companyId } =
@@ -147,6 +160,18 @@ export default function CompanyCart() {
     /**
      * Загальна кількість товарів
      */
+    const bottomSheetRef = useRef<BottomSheet>(null);
+
+    const [paymentMethod, setPaymentMethod] =
+        useState<"cash" | "applePay" | "googlePay" | "card">("card");
+
+    const [tipPercent, setTipPercent] = useState(0);
+
+    const snapPoints = useMemo(
+        () => ["65%", "90%"],
+        []
+    );
+
     const totalCount = useMemo(() => {
         if (!companyCart) {
             return 0;
@@ -159,23 +184,41 @@ export default function CompanyCart() {
         );
     }, [companyCart]);
 
-    /**
-     * Загальна ціна
-     */
-    const totalPrice = useMemo(() => {
+    const productsPrice = useMemo(() => {
         if (!companyCart) {
             return 0;
         }
 
         return companyCart.carts.reduce(
             (sum, cart) =>
-                sum +
-                getItemPrice(cart) *
-                cart.count,
+                sum + getItemPrice(cart) * cart.count,
             0
         );
     }, [companyCart]);
 
+    const totalWeight = useMemo(() => {
+        if (!companyCart) {
+            return 0;
+        }
+
+        return companyCart.carts.reduce(
+            (sum, cart) =>
+                sum + (cart.product.weight ?? 0) * cart.count,
+            0
+        );
+    }, [companyCart]);
+
+    const deliveryFee = useMemo(() => {
+        return calculateDeliveryFee(totalWeight);
+    }, [totalWeight]);
+
+    const tipAmount = useMemo(() => {
+        return productsPrice * tipPercent / 100;
+    }, [productsPrice, tipPercent]);
+
+    const totalPrice = useMemo(() => {
+        return productsPrice + deliveryFee + tipAmount;
+    }, [productsPrice, deliveryFee, tipAmount]);
     /**
      * Зміна кількості
      */
@@ -270,6 +313,42 @@ export default function CompanyCart() {
             },
         });
     };
+
+
+
+
+    const selectedAddressId =
+        useSelector(
+            (state: RootState) =>
+                state.address
+                    .selectedAddressId
+        );
+
+    const {data: addresses, isLoading: isAdressesLoading} = useGetAddressesQuery();
+
+    const selectedAddress =
+        addresses?.find(
+            (address) =>
+                address.id ===
+                selectedAddressId
+        ) ?? null;
+
+    const [confirmOrder, {isLoading: isConfirming}] = useConfirmOrderMutation();
+    const confirmOrderHandler = async () => {
+        try {
+            await confirmOrder({
+                companyId: companyId,
+                locationId: selectedAddress?.id ?? 0,
+                paymentMethod: IPaymentMethod[paymentMethod],
+                tipPercent: tipPercent,
+            }).unwrap()
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+
+
 
     if (isLoading) {
         return (
@@ -613,30 +692,48 @@ export default function CompanyCart() {
             >
                 <View className="flex-row items-center justify-between">
                     <View>
-                        <Text className="text-xs text-gray-500 dark:text-gray-400">
-                            {totalCount}{" "}
-                            {getProductWord(
-                                totalCount
-                            )}
-                        </Text>
+                        <View className="mb-3">
+                            <View className="flex-row justify-between">
+                                <Text className="text-sm text-gray-500 dark:text-gray-400">
+                                    Товари
+                                </Text>
 
-                        <Text className="mt-0.5 text-xl font-extrabold text-gray-900 dark:text-white">
-                            {money(
-                                totalPrice
-                            )}
-                        </Text>
+                                <Text className="text-sm font-semibold text-gray-900 dark:text-white">
+                                    {money(productsPrice)}
+                                </Text>
+                            </View>
+
+                            <View className="mt-1 flex-row justify-between">
+                                <Text className="text-sm text-gray-500 dark:text-gray-400">
+                                    Доставка
+                                </Text>
+
+                                <Text className="text-sm font-semibold text-gray-900 dark:text-white">
+                                    {money(deliveryFee)}
+                                </Text>
+                            </View>
+
+                            <View className="mt-2 flex-row justify-between gap-2">
+                                <Text className="text-base font-bold text-gray-900 dark:text-white">
+                                    Разом
+                                </Text>
+
+                                <Text className="text-xl font-extrabold text-gray-900 dark:text-white">
+                                    {money(totalPrice)}
+                                </Text>
+                            </View>
+                        </View>
                     </View>
 
                     <Pressable
-                        className="h-12 flex-1 items-center justify-center rounded-xl"
+                        className="h-12 flex-1 mt-auto items-center justify-center rounded-xl"
                         style={{
                             backgroundColor:
                             GREEN,
                             marginLeft: 16,
                         }}
                         onPress={() => {
-                            // TODO:
-                            // router.push("/checkout");
+                            bottomSheetRef.current?.expand();
                         }}
                     >
                         <Text className="text-sm font-bold text-white">
@@ -655,6 +752,215 @@ export default function CompanyCart() {
                     />
                 </View>
             )}
+
+
+            <BottomSheet
+                ref={bottomSheetRef}
+                index={-1}
+                snapPoints={snapPoints}
+                enablePanDownToClose
+                backgroundStyle={{
+                    backgroundColor: darkMode ? "#111827" : "#FFFFFF",
+                }}
+                handleIndicatorStyle={{
+                    backgroundColor: darkMode ? "#4B5563" : "#D1D5DB",
+                    width: 40,
+                }}
+                backdropComponent={(props) => (
+                    <BottomSheetBackdrop
+                        {...props}
+                        appearsOnIndex={0}
+                        disappearsOnIndex={-1}
+                        opacity={0.5}
+                    />
+                )}
+            >
+                <BottomSheetView
+                    className="flex-1 px-5 pb-5"
+                    style={{ backgroundColor: darkMode ? "#111827" : "#FFFFFF" }}
+                >
+                    {/* HEADER */}
+                    <View className="mb-6">
+                        <Text
+                            className="text-2xl font-extrabold"
+                            style={{ color: darkMode ? "#F9FAFB" : "#111827" }}
+                        >
+                            Оформлення замовлення
+                        </Text>
+
+                        <Text
+                            className="mt-1 text-sm"
+                            style={{ color: darkMode ? "#9CA3AF" : "#6B7280" }}
+                        >
+                            Оберіть спосіб оплати та чайові
+                        </Text>
+                    </View>
+
+                    {/* PAYMENT */}
+                    <Text
+                        className="mb-3 text-base font-extrabold"
+                        style={{ color: darkMode ? "#F9FAFB" : "#111827" }}
+                    >
+                        Спосіб оплати
+                    </Text>
+
+                    <View className="gap-2">
+                        {[
+                            {
+                                value: "cash",
+                                title: "Готівка",
+                                subtitle: "Оплата кур'єру",
+                                icon: <Banknote size={21} color={darkMode ? "#F9FAFB" : "#111827"} />,
+                            },
+                            {
+                                value: "applePay",
+                                title: "Apple Pay",
+                                subtitle: "Швидка оплата",
+                                icon: <Smartphone size={21} color={darkMode ? "#F9FAFB" : "#111827"} />,
+                            },
+                            {
+                                value: "googlePay",
+                                title: "Google Pay",
+                                subtitle: "Швидка оплата",
+                                icon: <Smartphone size={21} color={darkMode ? "#F9FAFB" : "#111827"} />,
+                            },
+                            {
+                                value: "card",
+                                title: "Банківська картка",
+                                subtitle: "Visa / Mastercard",
+                                icon: <CreditCard size={21} color={darkMode ? "#F9FAFB" : "#111827"} />,
+                            },
+                        ].map((item) => (
+                            <PaymentOption
+                                key={item.value}
+                                title={item.title}
+                                subtitle={item.subtitle}
+                                icon={item.icon}
+                                selected={paymentMethod === item.value}
+                                onPress={() => setPaymentMethod(item.value)}
+                                darkMode={darkMode}
+                            />
+                        ))}
+                    </View>
+
+                    {/* TIPS */}
+                    <Text
+                        className="mb-3 mt-6 text-base font-extrabold"
+                        style={{ color: darkMode ? "#F9FAFB" : "#111827" }}
+                    >
+                        Чайові
+                    </Text>
+
+                    <View className="flex-row gap-2">
+                        {[0, 5, 10, 15].map((percent) => {
+                            const selected = tipPercent === percent;
+
+                            return (
+                                <Pressable
+                                    key={percent}
+                                    onPress={() => setTipPercent(percent)}
+                                    className="h-12 flex-1 items-center justify-center rounded-xl border"
+                                    style={{
+                                        borderColor: selected
+                                            ? GREEN
+                                            : darkMode
+                                                ? "#374151"
+                                                : "#E5E7EB",
+                                        backgroundColor: selected
+                                            ? `${GREEN}15`
+                                            : darkMode
+                                                ? "#1F2937"
+                                                : "#FFFFFF",
+                                    }}
+                                >
+                                    <Text
+                                        className="text-sm font-bold"
+                                        style={{
+                                            color: selected
+                                                ? GREEN
+                                                : darkMode
+                                                    ? "#D1D5DB"
+                                                    : "#374151",
+                                        }}
+                                    >
+                                        {percent}%
+                                    </Text>
+                                </Pressable>
+                            );
+                        })}
+                    </View>
+
+                    {/* SUMMARY */}
+                    <View
+                        className="mt-6 rounded-2xl p-4 bg-[#F9FAFB] dark:bg-[#1F2937]"
+                    >
+                        {[
+                            ["Товари", money(productsPrice)],
+                            ["Доставка", money(deliveryFee)],
+                            ...(tipPercent > 0
+                                ? [[`Чайові (${tipPercent}%)`, money(tipAmount)]]
+                                : []),
+                        ].map(([label, value], index) => (
+                            <View
+                                key={label}
+                                className={`flex-row justify-between ${
+                                    index > 0 ? "mt-2" : ""
+                                }`}
+                            >
+                                <Text
+                                    className="text-sm text-[#111827] dark:text-[#F9FAFB]"
+                                >
+                                    {label}
+                                </Text>
+
+                                <Text
+                                    className="font-semibold text-[#111827] dark:text-[#F9FAFB]"
+                                >
+                                    {value}
+                                </Text>
+                            </View>
+                        ))}
+
+                        <View
+                            className="my-3 h-px bg-[#E5E7EB] dark:bg-[#374151]"
+                        />
+
+                        <View className="flex-row items-center justify-between">
+                            <Text
+                                className="text-base font-extrabold text-[#111827] dark:text-[#F9FAFB]"
+                            >
+                                Разом
+                            </Text>
+
+                            <Text
+                                className="text-xl font-extrabold text-[#111827] dark:text-[#F9FAFB]"
+                            >
+                                {money(totalPrice)}
+                            </Text>
+                        </View>
+                    </View>
+
+                    {/* CONFIRM */}
+                    <Pressable
+                        className="mt-4 h-14 items-center justify-center rounded-2xl"
+                        style={{ backgroundColor: GREEN }}
+                        onPress={async () => {
+                            await confirmOrderHandler();
+                            bottomSheetRef.current?.close();
+                            router.back();
+                        }}
+                    >
+                        {isConfirming ? (
+                            <ActivityIndicator size={"small"} color={"#fff"} />
+                        ) : (
+                            <Text className="text-base font-extrabold text-white">
+                                Підтвердити замовлення
+                            </Text>
+                        )}
+                    </Pressable>
+                </BottomSheetView>
+            </BottomSheet>
+
         </View>
     );
 }
@@ -688,3 +994,12 @@ function getProductWord(
 
     return "товарів";
 }
+
+
+const calculateDeliveryFee = (weight: number): number => {
+    if (weight <= 2000) return 50;
+    if (weight <= 3500) return 80;
+    if (weight <= 6000) return 120;
+
+    return 150;
+};

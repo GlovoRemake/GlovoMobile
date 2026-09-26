@@ -11,6 +11,10 @@ import { useGetCartsQuery } from "@/store/service/apiCart";
 import APP_ENV from "@/utils/env";
 import { money } from "@/components/food/theme";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {useSelector} from "react-redux";
+import type {RootState} from "@/store";
+import {useGetAddressesQuery} from "@/store/service/apiAddress";
+import {useGetCompaniesQuery} from "@/store/service/apiCompany";
 
 export default function Index() {
     const insets = useSafeAreaInsets();
@@ -20,6 +24,29 @@ export default function Index() {
         isLoading,
         isFetching,
     } = useGetCartsQuery();
+
+    const selectedAddressId =
+        useSelector(
+            (state: RootState) =>
+                state.address
+                    .selectedAddressId
+        );
+
+    const {data: addresses, isLoading: isAdressesLoading} = useGetAddressesQuery();
+
+    const selectedAddress =
+        addresses?.find(
+            (address) =>
+                address.id ===
+                selectedAddressId
+        ) ?? null;
+
+    const {data: companies, isLoading: isCompaniesLoading, isFetching: isCompaniesFerching} = useGetCompaniesQuery({
+        regionId: selectedAddress?.city.region.id ?? -1,
+        companyTypeIds: []
+    }, {
+        skip: !selectedAddress,
+    });
 
     if (isLoading) {
         return (
@@ -113,17 +140,20 @@ export default function Index() {
                         return (
                             <Pressable
                                 key={companyCart.company.id}
-                                onPress={() =>
-                                    router.push({
-                                        pathname:
-                                            "/(orders)/cart/company",
-                                        params: {
-                                            companyId:
-                                            companyCart
-                                                .company
-                                                .id,
-                                        },
-                                    })
+                                onPress={() => {
+                                        if (selectedAddress != null && companies?.find(x => x.id == companyCart.company.id) != null) {
+                                            router.push({
+                                                pathname:
+                                                    "/(orders)/cart/company",
+                                                params: {
+                                                    companyId:
+                                                    companyCart
+                                                        .company
+                                                        .id,
+                                                },
+                                            })
+                                        }
+                                    }
                                 }
                                 className="mx-5 mb-4 overflow-hidden rounded-2xl border border-gray-100 bg-white dark:border-zinc-800 dark:bg-zinc-900"
                             >
@@ -240,6 +270,18 @@ export default function Index() {
                                         </Text>
                                     )}
                                 </View>
+
+                                {selectedAddress == null && (
+                                    <View className={"w-full flex justify-center items-center py-2 h-10 bg-red-200"}>
+                                        <Text>Виберіть адресу для оформлення замовлення</Text>
+                                    </View>
+                                )}
+
+                                {selectedAddress != null && companies?.find(x => x.id == companyCart.company.id) == null && (
+                                    <View className={"w-full flex justify-center items-center py-2 h-10 bg-red-200"}>
+                                        <Text>На вибрану адерсу не доставляється</Text>
+                                    </View>
+                                )}
                             </Pressable>
                         );
                     })}

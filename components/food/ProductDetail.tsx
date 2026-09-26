@@ -14,7 +14,7 @@ import { router } from "expo-router";
 import { RoundButton, Price, DiscountBadge, FoodImage } from "./ui";
 import { AddBar } from "./BottomBars";
 import { GREEN, PRIMARY, RED } from "./theme";
-import { useUpdateCartMutation } from "@/store/service/apiCart";
+import {useAddToCartMutation, useUpdateCartMutation} from "@/store/service/apiCart";
 
 export interface ProductOption {
     id: number;
@@ -72,6 +72,7 @@ export default function ProductDetail({
                                       }: ProductDetailProps) {
     const insets = useSafeAreaInsets();
     const [updateCart, { isLoading: isUpdating }] = useUpdateCartMutation();
+    const [add, {isLoading: isAdding}] = useAddToCartMutation();
 
     const [selectedIds, setSelectedIds] = useState<number[]>(
         initialSelectedIds
@@ -178,7 +179,15 @@ export default function ProductDetail({
             return;
         }
 
-        if (onAdd) await onAdd(selectedIds, quantity);
+
+        try {
+            await add({
+                productId: productId,
+                count: quantity,
+                additionalIds: selectedIds
+            }).unwrap();
+            router.back();
+        } catch (error) {}
     };
 
     const buttonLabel = mode === "edit" ? "Зберегти зміни" : "Додати";
@@ -358,7 +367,7 @@ export default function ProductDetail({
                 quantity={quantity}
                 onQuantityChange={setQuantity}
                 onAdd={handleSave}
-                disabled={!validation.valid || isUpdating}
+                disabled={!validation.valid || isUpdating || isAdding}
                 buttonLabel={buttonLabel}
             />
 

@@ -23,6 +23,17 @@ import {IAuthRegister} from "@/types/auth/IAuthRegister";
 
 WebBrowser.maybeCompleteAuthSession();
 
+function formatUkrainianPhone(value: string) {
+    const digits = value.replace(/\D/g, "");
+    const nationalNumber = digits.startsWith("380")
+        ? digits.slice(3)
+        : digits.startsWith("0")
+            ? digits.slice(1)
+            : digits;
+
+    return `+380${nationalNumber.slice(0, 9)}`;
+}
+
 export default function LoginScreen() {
     const [sendCode, {isLoading: isSending}] = useSendCodeMutation();
     const [verifyCode, {isLoading: isVerifing}] = useVerifyCodeMutation();
@@ -170,27 +181,30 @@ export default function LoginScreen() {
         }
     }
 
-    const {handleSubmit, control, formState: { errors }} = useForm<IAuthRegister>();
+    const { handleSubmit, control, formState: { errors } } = useForm<IAuthRegister>({
+        defaultValues: { phone: "+380" },
+    });
 
     return (
-        <View className="flex-1 bg-white dark:bg-[#0B0D0F]">
+        <KeyboardAvoidingView
+            className="flex-1 bg-white dark:bg-[#0B0D0F]"
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
 
             <AuthHero />
 
             <ScrollView
                 showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ flexGrow: 1 }}
+                keyboardShouldPersistTaps="handled"
+                keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
+                contentContainerStyle={{
+                    flexGrow: 1,
+                    paddingTop: 278,
+                    paddingBottom: 120,
+                }}
+                className="z-10"
+
             >
-                <ScrollView
-                    showsVerticalScrollIndicator={false}
-                    keyboardShouldPersistTaps="handled"
-                    contentContainerStyle={{
-                        flexGrow: 1,
-                        paddingTop: 278,
-                        paddingBottom: 20,
-                    }}
-                    className="z-10"
-                >
                     <AuthCard>
 
                         <Animated.View
@@ -481,7 +495,57 @@ export default function LoginScreen() {
                                         </View>
                                     </View>
 
-                                    <View className="mt-2">
+                                    <View className="mt-3">
+                                        <View className="mb-1 flex-row">
+                                            <Text className="text-sm font-nunito-semibold text-neutral-700 dark:text-[#D8DDE1]">
+                                                Номер телефону
+                                            </Text>
+                                        </View>
+
+                                        <Controller
+                                            name="phone"
+                                            control={control}
+                                            rules={{
+                                                required: "Номер телефону обов'язковий",
+                                                pattern: {
+                                                    value: /^\+380\d{9}$/,
+                                                    message: "Введіть український номер у форматі +380XXXXXXXXX",
+                                                },
+                                            }}
+                                            render={({ field: { onChange, onBlur, value } }) => (
+                                                <>
+                                                    <Input
+                                                        className={`min-h-14 flex-1 bg-white px-4 text-neutral-950 dark:bg-[#1B1F23] dark:text-white ${errors.phone
+                                                            ? "border-red-400 dark:border-red-500"
+                                                            : "border-neutral-200 dark:border-[#292E33]"
+                                                            }`}
+                                                        keyboardType="phone-pad"
+                                                        placeholder="+380XXXXXXXXX"
+                                                        placeholderTextColor="#A3A3A3"
+                                                        autoComplete="tel"
+                                                        maxLength={13}
+                                                        returnKeyType="next"
+                                                        onChangeText={(text) => onChange(formatUkrainianPhone(text))}
+                                                        onBlur={onBlur}
+                                                        value={value}
+                                                    />
+
+                                                    {errors.phone && (
+                                                        <View className="mt-1 flex-row items-center">
+                                                            <Text className="mr-1 text-xs font-nunito-semibold text-red-500">
+                                                                !
+                                                            </Text>
+                                                            <Text className="text-xs font-nunito-semibold text-red-500">
+                                                                {errors.phone.message}
+                                                            </Text>
+                                                        </View>
+                                                    )}
+                                                </>
+                                            )}
+                                        />
+                                    </View>
+
+                                    <View className="mt-3">
                                         <View className="mb-1 flex-row">
                                             <Text className="text-sm font-nunito-semibold text-neutral-700 dark:text-[#D8DDE1]">
                                                 Пароль
@@ -593,7 +657,6 @@ export default function LoginScreen() {
 
                     </AuthCard>
                 </ScrollView>
-            </ScrollView>
-        </View>
+        </KeyboardAvoidingView>
     );
 }

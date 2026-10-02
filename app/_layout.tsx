@@ -28,8 +28,6 @@ configureReanimatedLogger({
 });
 
 if (__DEV__) {
-    saveSecureStore("accessToken", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjAxOWY5ZTZmLTAxNDEtNzZiYy1iOTFjLThhY2EyYjNiOGEyNyIsImVtYWlsIjoicm9jYWZpZzM2MUBqb2JyYXV4LmNvbSIsInNlY3VyaXR5X3N0YW1wIjoiSEczS0lMNUJCWldESUtOWERBMlRXM0Y2TVI3UTdCNE0iLCJyb2xlIjoiT3duZXIiLCJleHAiOjE0ODk1NzY1MjYsImlzcyI6Ikdsb3ZvIiwiYXVkIjoiUHJpbWFyeSJ9.4qT2evWid8mQc-alC_opIAK_c44knCT-NsgcJ3aavbU");
-
     console.log(`Access token: ${getSecureStore("accessToken")}`);
     console.log(`Refresh token: ${getSecureStore("refreshToken")}`);
 

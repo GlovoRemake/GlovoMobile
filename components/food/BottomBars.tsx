@@ -1,6 +1,6 @@
 import { ChevronRight, Minus, Plus, Trash2 } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { GREEN, money } from "./theme";
+import { GREEN, money } from "@/components/food/theme";
 import React, { useEffect, useState } from "react";
 import {
     View,

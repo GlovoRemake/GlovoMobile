@@ -13,7 +13,7 @@ import { router } from "expo-router";
 
 import { RoundButton, Price, DiscountBadge, FoodImage } from "./ui";
 import { AddBar } from "./BottomBars";
-import { GREEN, PRIMARY, RED } from "./theme";
+import { GREEN, PRIMARY, RED } from "@/components/food/theme";
 import {useAddToCartMutation, useUpdateCartMutation} from "@/store/service/apiCart";
 
 export interface ProductOption {
@@ -181,6 +181,8 @@ export default function ProductDetail({
 
 
         try {
+            console.log(selectedIds);
+
             await add({
                 productId: productId,
                 count: quantity,

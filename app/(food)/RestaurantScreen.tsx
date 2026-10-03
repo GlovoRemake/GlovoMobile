@@ -459,7 +459,7 @@ export default function RestaurantScreen() {
                         showsHorizontalScrollIndicator={false}
                         className="mt-4"
                         contentContainerStyle={{
-                            width: "100%",
+                            minWidth: "100%",
                             paddingHorizontal: 8,
                             borderBottomWidth: 1,
                             borderBottomColor: theme.border,

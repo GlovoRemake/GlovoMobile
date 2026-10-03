@@ -9,7 +9,8 @@ import {
     LogOut,
     MapPin,
     Pencil,
-    RotateCw
+    RotateCw,
+    RotateCcwClock
 } from "lucide-react-native";
 import React from "react";
 import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from "react-native";
@@ -148,21 +149,21 @@ export default function Index() {
                     className="overflow-hidden rounded-[24px] bg-white dark:bg-zinc-900"
                 >
                     <ProfileRow
-                        icon={<MapPin size={21} color="#111827" />}
-                        iconBackground="#FFF4D6"
-                        title="Мої адреси"
-                        subtitle="Керування адресами доставки"
-                        onPress={() => router.push("/(main)/profile/myAddresses")}
+                        icon={<RotateCcwClock size={21} color="#111827" />}
+                        iconBackground="#d6fff2"
+                        title="Історія замовлень"
+                        subtitle="Переглянути замовлення які вже виконані"
+                        onPress={() => router.push("/(main)/profile/ordersHistory")}
                     />
 
                     <Divider />
 
                     <ProfileRow
-                        icon={<KeyRound size={21} color="#111827" />}
-                        iconBackground="#E8F7ED"
-                        title="Зміна пароля"
-                        subtitle="Змінити свій пароль на новий"
-                        onPress={() => { }}
+                        icon={<MapPin size={21} color="#111827" />}
+                        iconBackground="#FFF4D6"
+                        title="Мої адреси"
+                        subtitle="Керування адресами доставки"
+                        onPress={() => router.push("/(main)/profile/myAddresses")}
                     />
                 </View>
 

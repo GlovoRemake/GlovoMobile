@@ -14,6 +14,11 @@ export default function RootLayout() {
             />
 
             <Stack.Screen
+                name="ordersHistory"
+                options={{ headerShown: false }}
+            />
+
+            <Stack.Screen
                 name="myAddresses"
                 options={{ headerShown: false }}
             />

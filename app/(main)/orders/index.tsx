@@ -67,19 +67,28 @@ export default function Index() {
                     paddingTop: insets.top,
                 }}
             >
-                <View className={"w-full"}>
-                    <ActiveOrders />
-                </View>
+                <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={{
+                        paddingTop: insets.top + 16,
+                        paddingBottom: insets.bottom + 24,
+                    }}
+                >
+                    <View className={"w-full"}>
+                        <ActiveOrders />
+                    </View>
 
 
-                <Text className="mt-8 text-xl font-extrabold text-gray-900 dark:text-white">
-                    Кошик порожній
-                </Text>
+                    <Text className="mt-8 text-xl font-extrabold text-gray-900 dark:text-white">
+                        Кошик порожній
+                    </Text>
 
-                <Text className="mt-2 text-center text-gray-500 dark:text-gray-400">
-                    Додайте товари з ресторанів,
-                    щоб вони з&#39;явилися тут
-                </Text>
+                    <Text className="mt-2 text-center text-gray-500 dark:text-gray-400">
+                        Додайте товари з ресторанів,
+                        щоб вони з&#39;явилися тут
+                    </Text>
+
+                </ScrollView>
             </View>
         );
     }

@@ -58,6 +58,10 @@ export default function ActiveOrders() {
     const [orders, setOrders] = useState<IOrder[]>([]);
     const [expandedId, setExpandedId] = useState<number | null>(null);
 
+    useEffect(() => {
+        setOrders(initialOrders);
+    }, [initialOrders]);
+
     const connectionRef = useRef<any>(null);
 
     const theme = useMemo(
@@ -81,10 +85,6 @@ export default function ActiveOrders() {
         }),
         [dark]
     );
-
-    useEffect(() => {
-        setOrders(initialOrders);
-    }, [isLoading]);
 
     /*
      * =========================
@@ -286,7 +286,7 @@ export default function ActiveOrders() {
     }
 
     return (
-        <View className="mb-6 px-4">
+        <View className="mb-6">
             <Text
                 className="mb-3 text-[25px] font-extrabold"
                 style={{ color: theme.text }}

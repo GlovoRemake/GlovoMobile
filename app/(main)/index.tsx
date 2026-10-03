@@ -1,6 +1,7 @@
-import React from "react";
+import React, {useState} from "react";
 
 import {
+    Image,
     Pressable,
     ScrollView,
     Text,
@@ -10,17 +11,13 @@ import {
 
 import {
     ChevronDown,
-    Clock3,
     MapPin,
     Search,
-    ShoppingBag,
-    Sparkles,
 } from "lucide-react-native";
 
 import {router} from "expo-router";
 
 import {
-    useDispatch,
     useSelector,
 } from "react-redux";
 
@@ -32,8 +29,9 @@ import {
     openAddressSheet,
 } from "@/components/address/addressSheet";
 import {useGetAddressesQuery} from "@/store/service/apiAddress";
-import {useGetCompaniesQuery} from "@/store/service/apiCompany";
+import {useGetCompaniesQuery, useGetCompanyTypesQuery} from "@/store/service/apiCompany";
 import RestaurantCard from "@/components/food/RestaurantCard";
+import APP_ENV from "@/utils/env";
 
 const PRIMARY = "#FFC244";
 
@@ -57,42 +55,10 @@ const COLORS = {
     },
 };
 
-const categories = [
-    {
-        id: "food",
-        title: "Їжа",
-        icon: "🍔",
-    },
-    {
-        id: "groceries",
-        title: "Продукти",
-        icon: "🛒",
-    },
-    {
-        id: "pharmacy",
-        title: "Аптека",
-        icon: "💊",
-    },
-    {
-        id: "shops",
-        title: "Магазини",
-        icon: "🛍️",
-    },
-    {
-        id: "flowers",
-        title: "Квіти",
-        icon: "🌸",
-    },
-    {
-        id: "more",
-        title: "Ще",
-        icon: "•••",
-    },
-];
-
 export default function HomeScreen() {
     const scheme = useColorScheme();
-
+    const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+    const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<number | null>(null);
 
     const colors =
         scheme === "dark"
@@ -106,7 +72,18 @@ export default function HomeScreen() {
                     .selectedAddressId
         );
 
-    const {data: addresses, isLoading} = useGetAddressesQuery();
+    const {data: addresses} = useGetAddressesQuery();
+    const {data: companyTypes = []} = useGetCompanyTypesQuery();
+    const categories = companyTypes.filter((companyType) => companyType.parentTypeId === null);
+    const selectedCategory = categories.find((category) => category.id === selectedCategoryId);
+    const subcategories = selectedCategory
+        ? companyTypes.filter((companyType) => companyType.parentTypeId === selectedCategory.id)
+        : [];
+    const selectedCompanyTypeIds = selectedCategory
+        ? selectedSubcategoryId !== null
+            ? [selectedSubcategoryId]
+            : [selectedCategory.id, ...subcategories.map((subcategory) => subcategory.id)]
+        : [];
 
     const selectedAddress =
         addresses?.find(
@@ -115,9 +92,9 @@ export default function HomeScreen() {
                 selectedAddressId
         ) ?? null;
 
-    const {data: companies, isLoading: isCompaniesLoading, isFetching} = useGetCompaniesQuery({
+    const {data: companies} = useGetCompaniesQuery({
         regionId: selectedAddress?.city.region.id ?? -1,
-        companyTypeIds: []
+        companyTypeIds: selectedCompanyTypeIds
     }, {
         skip: !selectedAddress,
     });
@@ -332,11 +309,17 @@ export default function HomeScreen() {
                                     Категорії
                                 </Text>
 
-                                <Pressable>
+                                <Pressable
+                                    onPress={() => {
+                                        setSelectedCategoryId(null);
+                                        setSelectedSubcategoryId(null);
+                                    }}
+                                >
                                     <Text
                                         style={{
-                                            color:
-                                            PRIMARY,
+                                            color: selectedCategoryId === null
+                                                ? colors.secondary
+                                                : PRIMARY,
                                         }}
                                         className="font-semibold"
                                     >
@@ -354,17 +337,21 @@ export default function HomeScreen() {
                                     paddingHorizontal: 20,
                                 }}
                             >
-                                {categories.map(
-                                    (category) => (
+                                {categories.map((category) => {
+                                    const isSelected = category.id === selectedCategoryId;
+
+                                    return (
                                         <Pressable
-                                            key={
-                                                category.id
-                                            }
+                                            key={category.id}
+                                            onPress={() => {
+                                                setSelectedCategoryId((currentId) =>
+                                                    currentId === category.id ? null : category.id
+                                                );
+                                                setSelectedSubcategoryId(null);
+                                            }}
                                             style={{
-                                                backgroundColor:
-                                                colors.surface,
-                                                borderColor:
-                                                colors.border,
+                                                backgroundColor: colors.surface,
+                                                borderColor: isSelected ? PRIMARY : colors.border,
                                             }}
                                             className="mr-3 w-[82px] items-center rounded-2xl border py-4"
                                         >
@@ -376,33 +363,92 @@ export default function HomeScreen() {
                                                             ? "#27272A"
                                                             : "#F8F9FA",
                                                 }}
-                                                className="h-12 w-12 items-center justify-center rounded-full"
+                                                className="h-12 w-12 items-center justify-center overflow-hidden rounded-full"
                                             >
-                                                <Text className="text-2xl">
-                                                    {
-                                                        category.icon
-                                                    }
-                                                </Text>
+                                                {category.iconPath ? (
+                                                    <Image
+                                                        source={{
+                                                            uri: `${APP_ENV.API_IMAGE_SMALL_URL}${category.iconPath}`,
+                                                        }}
+                                                        className="h-full w-full"
+                                                        resizeMode="cover"
+                                                    />
+                                                ) : (
+                                                    <Text className="text-xl">🏪</Text>
+                                                )}
                                             </View>
 
                                             <Text
-                                                style={{
-                                                    color:
-                                                    colors.text,
-                                                }}
-                                                numberOfLines={
-                                                    1
-                                                }
+                                                style={{color: colors.text}}
+                                                numberOfLines={1}
                                                 className="mt-2 text-xs font-semibold"
                                             >
-                                                {
-                                                    category.title
-                                                }
+                                                {category.name}
                                             </Text>
                                         </Pressable>
-                                    )
-                                )}
+                                    );
+                                })}
                             </ScrollView>
+
+                            {selectedCategory && subcategories.length > 0 && (
+                                <ScrollView
+                                    horizontal
+                                    showsHorizontalScrollIndicator={false}
+                                    contentContainerStyle={{
+                                        paddingHorizontal: 20,
+                                        paddingTop: 12,
+                                    }}
+                                >
+                                    <Pressable
+                                        onPress={() => setSelectedSubcategoryId(null)}
+                                        style={{
+                                            backgroundColor: selectedSubcategoryId === null
+                                                ? PRIMARY
+                                                : colors.surface,
+                                            borderColor: selectedSubcategoryId === null
+                                                ? PRIMARY
+                                                : colors.border,
+                                        }}
+                                        className="mr-2 rounded-full border px-4 py-2"
+                                    >
+                                        <Text
+                                            style={{
+                                                color: selectedSubcategoryId === null
+                                                    ? "#111111"
+                                                    : colors.text,
+                                            }}
+                                            className="text-sm font-semibold"
+                                        >
+                                            Усі
+                                        </Text>
+                                    </Pressable>
+
+                                    {subcategories.map((subcategory) => {
+                                        const isSelected = subcategory.id === selectedSubcategoryId;
+
+                                        return (
+                                            <Pressable
+                                                key={subcategory.id}
+                                                onPress={() => setSelectedSubcategoryId(subcategory.id)}
+                                                style={{
+                                                    backgroundColor: isSelected ? PRIMARY : colors.surface,
+                                                    borderColor: isSelected ? PRIMARY : colors.border,
+                                                }}
+                                                className="mr-2 rounded-full border px-4 py-2"
+                                            >
+                                                <Text
+                                                    style={{
+                                                        color: isSelected ? "#111111" : colors.text,
+                                                    }}
+                                                    className="text-sm font-semibold"
+                                                >
+                                                    {subcategory.name}
+                                                </Text>
+                                            </Pressable>
+                                        );
+                                    })}
+                                </ScrollView>
+                            )}
                         </View>
 
                         {companies && companies.length > 0 && (

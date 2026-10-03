@@ -7,11 +7,8 @@ import { IUpdateCart } from "@/types/Cart/IUpdateCart";
 
 export const apiCart = createApi({
     reducerPath: "apiCart",
-
     baseQuery: baseQueryWithReauth,
-
     tagTypes: ["Cart"],
-
     endpoints: (builder) => ({
         getCarts: builder.query<IUserCart[], void>({
             query: () => ({

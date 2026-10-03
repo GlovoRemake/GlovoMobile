@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Image, Pressable, ImageSourcePropType } from "react-native";
 import { Minus, Plus, Trash2 } from "lucide-react-native";
-import { RED, money } from "./theme";
+import { RED, money } from "@/components/food/theme";
 
 /* ------------------------------------------------------------------ */
 /* FoodImage — заглушка з емодзі. Передайте `source`, щоб показати фото */

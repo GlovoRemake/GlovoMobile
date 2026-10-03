@@ -15,6 +15,7 @@ import {useSelector} from "react-redux";
 import type {RootState} from "@/store";
 import {useGetAddressesQuery} from "@/store/service/apiAddress";
 import {useGetCompaniesQuery} from "@/store/service/apiCompany";
+import ActiveOrders from "@/components/ui/custom/ActiveOrders";
 
 export default function Index() {
     const insets = useSafeAreaInsets();
@@ -61,12 +62,17 @@ export default function Index() {
     if (!carts || carts.length === 0) {
         return (
             <View
-                className="flex-1 items-center justify-center bg-white px-5 dark:bg-black"
+                className="flex-1 items-center bg-white px-4 dark:bg-black"
                 style={{
                     paddingTop: insets.top,
                 }}
             >
-                <Text className="text-2xl font-extrabold text-gray-900 dark:text-white">
+                <View className={"w-full"}>
+                    <ActiveOrders />
+                </View>
+
+
+                <Text className="mt-8 text-xl font-extrabold text-gray-900 dark:text-white">
                     Кошик порожній
                 </Text>
 
@@ -87,7 +93,11 @@ export default function Index() {
                     paddingBottom: insets.bottom + 24,
                 }}
             >
-                <Text className="px-5 text-3xl font-extrabold text-gray-900 dark:text-white">
+                <View className={"px-4"}>
+                    <ActiveOrders />
+                </View>
+
+                <Text className="px-4 text-3xl font-extrabold text-gray-900 dark:text-white">
                     Кошик
                 </Text>
 

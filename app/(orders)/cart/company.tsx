@@ -31,6 +31,7 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 
 import {
+    apiCart,
     useDeleteFromCartMutation,
     useGetCartsQuery,
     useUpdateCartMutation,
@@ -46,7 +47,7 @@ import {
 import {useGetAddressesQuery} from "@/store/service/apiAddress";
 import {useGetCompaniesQuery} from "@/store/service/apiCompany";
 import {useSelector} from "react-redux";
-import type {RootState} from "@/store";
+import {RootState, useAppDispatch} from "@/store";
 import {useConfirmOrderMutation} from "@/store/service/apiOrder";
 import {IPaymentMethod} from "@/types/Order/IPaymentMethod";
 
@@ -333,6 +334,7 @@ export default function CompanyCart() {
                 selectedAddressId
         ) ?? null;
 
+    const dispatch = useAppDispatch();
     const [confirmOrder, {isLoading: isConfirming}] = useConfirmOrderMutation();
     const confirmOrderHandler = async () => {
         try {
@@ -342,6 +344,8 @@ export default function CompanyCart() {
                 paymentMethod: IPaymentMethod[paymentMethod],
                 tipPercent: tipPercent,
             }).unwrap()
+
+            dispatch(apiCart.util.invalidateTags(["Cart"]));
         } catch (error) {
             console.error(error)
         }

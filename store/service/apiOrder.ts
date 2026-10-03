@@ -29,10 +29,19 @@ export const apiOrder = createApi({
 
             invalidatesTags: ["Order"],
         }),
+
+        orderHistory: builder.query<IOrder[], void>({
+            query: () => ({
+                url: "/Order/history-orders",
+            }),
+
+            invalidatesTags: ["Order"],
+        }),
     }),
 });
 
 export const {
     useConfirmOrderMutation,
     useGetActiveOrdersQuery,
+    useOrderHistoryQuery,
 } = apiOrder;

@@ -59,7 +59,11 @@ export default function ActiveOrders() {
     const [expandedId, setExpandedId] = useState<number | null>(null);
 
     useEffect(() => {
-        setOrders(initialOrders);
+        const set = () => {
+            setOrders(initialOrders);
+        }
+
+        set();
     }, [initialOrders]);
 
     const connectionRef = useRef<any>(null);
